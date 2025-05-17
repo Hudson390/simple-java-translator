@@ -2,7 +2,7 @@ package br.ufma;
 
 public class Parser {
     private Scanner scan;
-    private char currentToken;
+    private Token currentToken;
 
     public Parser(byte[] input) {
         scan = new Scanner(input);
@@ -13,8 +13,8 @@ public class Parser {
         currentToken = scan.nextToken();
     }
 
-    private void match(char t) {
-        if (currentToken == t) {
+    private void matchToken(TokenType t) {
+        if (currentToken.type == t) {
             nextToken();
         } else {
             throw new Error("syntax error");
@@ -22,22 +22,22 @@ public class Parser {
     }
 
     void digit() {
-        if (Character.isDigit(currentToken)) {
-            System.out.println("push " + currentToken);
-            match(currentToken);
+        if (currentToken.type == TokenType.NUMBER) {
+            System.out.println("push " + currentToken.lexeme);
+            matchToken(TokenType.NUMBER);
         } else {
             throw new Error("syntax error");
         }
     }
 
     void oper() {
-        if (currentToken == '+') {
-            match('+');
+        if (currentToken.type == TokenType.PLUS) {
+            matchToken(TokenType.PLUS);
             digit();
             System.out.println("add");
             oper();
-        } else if (currentToken == '-') {
-            match('-');
+        } else if (currentToken.type == TokenType.MINUS) {
+            matchToken(TokenType.MINUS);
             digit();
             System.out.println("sub");
             oper();
