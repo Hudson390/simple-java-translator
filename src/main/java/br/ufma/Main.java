@@ -1,10 +1,12 @@
 package br.ufma;
 
 public class Main {
-    public static void main(String[] args) {
-        String input = "8+5-7+9";
-        Scanner scanner = new Scanner(input.getBytes());
+    public static void main(String[] args) throws Exception {
+
+        String input = "let a = 42 + 5 - 8;";
+
         Parser p = new Parser(input.getBytes());
         p.parse();
     }
+
 }

@@ -13,7 +13,7 @@ public class Parser {
         currentToken = scan.nextToken();
     }
 
-    private void matchToken(TokenType t) {
+    private void match(TokenType t) {
         if (currentToken.type == t) {
             nextToken();
         } else {
@@ -21,35 +21,58 @@ public class Parser {
         }
     }
 
-    void digit() {
-        if (currentToken.type == TokenType.NUMBER) {
-            System.out.println("push " + currentToken.lexeme);
-            matchToken(TokenType.NUMBER);
-        } else {
-            throw new Error("syntax error");
-        }
+    void number() {
+        System.out.println("push " + currentToken.lexeme);
+        match(TokenType.NUMBER);
+    }
+
+    void expr() {
+        term();
+        oper();
     }
 
     void oper() {
         if (currentToken.type == TokenType.PLUS) {
-            matchToken(TokenType.PLUS);
-            digit();
+            match(TokenType.PLUS);
+            term();
             System.out.println("add");
             oper();
         } else if (currentToken.type == TokenType.MINUS) {
-            matchToken(TokenType.MINUS);
-            digit();
+            match(TokenType.MINUS);
+            term();
             System.out.println("sub");
             oper();
         }
     }
 
-    void expr() {
-        digit();
-        oper();
+    void term() {
+        if (currentToken.type == TokenType.NUMBER)
+            number();
+        else if (currentToken.type == TokenType.IDENT) {
+            System.out.println("push " + currentToken.lexeme);
+            match(TokenType.IDENT);
+        } else {
+            throw new Error("syntax error");
+        }
     }
 
-    public void parse() {
+    void letStatement() {
+        match(TokenType.LET);
+        String id = currentToken.lexeme; // [cite: 42, 43]
+        match(TokenType.IDENT);
+        match(TokenType.EQ);
         expr();
+        System.out.println("pop " + id); // [cite: 43]
+        match(TokenType.SEMICOLON);
+    }
+
+    public void parse() { // [cite: 39, 40]
+        letStatement();
+    }
+
+    public static void main(String[] args) {
+        String input = "let a = 42 + 5;";
+        Parser p = new Parser(input.getBytes());
+        p.parse();
     }
 }
