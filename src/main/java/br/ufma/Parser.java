@@ -1,8 +1,14 @@
 package br.ufma;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Parser {
+
     private Scanner scan;
     private Token currentToken;
+    private List<String> outputCommands = new ArrayList<>();
 
     public Parser(byte[] input) {
         scan = new Scanner(input);
@@ -21,8 +27,12 @@ public class Parser {
         }
     }
 
+    void emit(String command) {
+        outputCommands.add(command);
+    }
+
     void number() {
-        System.out.println("push " + currentToken.lexeme);
+        emit("push " + currentToken.lexeme);
         match(TokenType.NUMBER);
     }
 
@@ -35,12 +45,12 @@ public class Parser {
         if (currentToken.type == TokenType.PLUS) {
             match(TokenType.PLUS);
             term();
-            System.out.println("add");
+            emit("add");
             oper();
         } else if (currentToken.type == TokenType.MINUS) {
             match(TokenType.MINUS);
             term();
-            System.out.println("sub");
+            emit("sub");
             oper();
         }
     }
@@ -49,7 +59,7 @@ public class Parser {
         if (currentToken.type == TokenType.NUMBER)
             number();
         else if (currentToken.type == TokenType.IDENT) {
-            System.out.println("push " + currentToken.lexeme);
+            emit("push " + currentToken.lexeme);
             match(TokenType.IDENT);
         } else {
             throw new Error("syntax error");
@@ -62,14 +72,14 @@ public class Parser {
         match(TokenType.IDENT);
         match(TokenType.EQ);
         expr();
-        System.out.println("pop " + id);
+        emit("pop " + id);
         match(TokenType.SEMICOLON);
     }
 
     void printStatement() {
         match(TokenType.PRINT);
         expr();
-        System.out.println("print");
+        emit("print");
         match(TokenType.SEMICOLON);
     }
 
@@ -90,12 +100,22 @@ public class Parser {
     }
 
     public void parse() {
-        statements(); // Modifiquei para analisar múltiplos statements
+        statements();
+    }
+
+    public String getOutput() {
+        return outputCommands.stream().collect(Collectors.joining(System.getProperty("line.separator")));
     }
 
     public static void main(String[] args) {
-        String input = "let a = 42 + 5; print a;";
+        String input = """
+                let a = 42 + 5 - 8;
+                let b = 56 + 8;
+                print a + b + 6;
+                    """;
         Parser p = new Parser(input.getBytes());
         p.parse();
+        System.out.println("--- Parser Output ---");
+        System.out.println(p.getOutput());
     }
 }
