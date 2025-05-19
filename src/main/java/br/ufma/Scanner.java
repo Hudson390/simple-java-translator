@@ -55,15 +55,48 @@ public class Scanner {
         return new Token(TokenType.NUMBER, n);
     }
 
+    private char peekNext() {
+        if (current + 1 < input.length)
+            return (char) input[current + 1];
+        return '\0';
+    }
+
+    private char peekNextNext() {
+        if (current + 2 < input.length)
+            return (char) input[current + 2];
+        return '\0';
+    }
+
+    private char peekNextNextNext() {
+        if (current + 3 < input.length)
+            return (char) input[current + 3];
+        return '\0';
+    }
+
+    private char peekNextNextNextNext() {
+        if (current + 4 < input.length)
+            return (char) input[current + 4];
+        return '\0';
+    }
+
     public Token nextToken() {
         skipWhitespace();
         char ch = peek();
         if (isAlpha(ch)) {
-            if (ch == 'l' && peekNext() == 'e' && peekNextNext() == 't') { // [cite: 32, 33, 34, 35]
+            if (ch == 'l' && peekNext() == 'e' && peekNextNext() == 't') {
                 advance();
                 advance();
                 advance();
                 return new Token(TokenType.LET, "let");
+            }
+            if (ch == 'p' && peekNext() == 'r' && peekNextNext() == 'i' && peekNextNextNext() == 'n'
+                    && peekNextNextNextNext() == 't') {
+                advance();
+                advance();
+                advance();
+                advance();
+                advance();
+                return new Token(TokenType.PRINT, "print"); // Adicionei o reconhecimento de "print"
             }
             return identifier();
         } else if (ch == '0') {
@@ -92,20 +125,8 @@ public class Scanner {
         }
     }
 
-    private char peekNext() {
-        if (current + 1 < input.length)
-            return (char) input[current + 1];
-        return '\0';
-    }
-
-    private char peekNextNext() {
-        if (current + 2 < input.length)
-            return (char) input[current + 2];
-        return '\0';
-    }
-
     public static void main(String[] args) {
-        String input = "let a = 42 + 5;";
+        String input = "let a = 42 + 5; print a;";
         Scanner scan = new Scanner(input.getBytes());
         for (Token tk = scan.nextToken(); tk.type != TokenType.EOF; tk = scan.nextToken()) {
             System.out.println(tk);

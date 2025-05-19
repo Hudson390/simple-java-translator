@@ -8,5 +8,6 @@ public enum TokenType {
     EOF,
     EQ,
     SEMICOLON,
-    LET // [cite: 29, 30]
+    LET,
+    PRINT // Adicionei PRINT
 }

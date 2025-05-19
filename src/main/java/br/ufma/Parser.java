@@ -58,20 +58,43 @@ public class Parser {
 
     void letStatement() {
         match(TokenType.LET);
-        String id = currentToken.lexeme; // [cite: 42, 43]
+        String id = currentToken.lexeme;
         match(TokenType.IDENT);
         match(TokenType.EQ);
         expr();
-        System.out.println("pop " + id); // [cite: 43]
+        System.out.println("pop " + id);
         match(TokenType.SEMICOLON);
     }
 
-    public void parse() { // [cite: 39, 40]
-        letStatement();
+    void printStatement() {
+        match(TokenType.PRINT);
+        expr();
+        System.out.println("print");
+        match(TokenType.SEMICOLON);
+    }
+
+    void statement() {
+        if (currentToken.type == TokenType.PRINT) {
+            printStatement();
+        } else if (currentToken.type == TokenType.LET) {
+            letStatement();
+        } else {
+            throw new Error("syntax error");
+        }
+    }
+
+    void statements() {
+        while (currentToken.type != TokenType.EOF) {
+            statement();
+        }
+    }
+
+    public void parse() {
+        statements(); // Modifiquei para analisar múltiplos statements
     }
 
     public static void main(String[] args) {
-        String input = "let a = 42 + 5;";
+        String input = "let a = 42 + 5; print a;";
         Parser p = new Parser(input.getBytes());
         p.parse();
     }
